@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
+// import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+import ClientProvider from "@/components/ClientProvider";
+import ClientHeader from "@/components/ClientHeader";
 
 export const metadata: Metadata = {
   title: "Sai Events",
@@ -16,10 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <Header />
-        {children}
-        <Footer />
+      <body className="flex flex-col min-h-screen">
+        <ClientProvider>
+          <ClientHeader />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </ClientProvider>
       </body>
     </html>
   );

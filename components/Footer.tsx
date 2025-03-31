@@ -9,7 +9,6 @@ const Footer = () => {
   return (
     <footer className="bg-[#81a7e3] text-black py-8">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* About Section */}
         <div>
           <h3 className="text-lg font-bold uppercase">About</h3>
           <ul className="mt-4 space-y-2">

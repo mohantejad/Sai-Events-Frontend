@@ -21,36 +21,19 @@ const eventFilters = [
   "Charity & Causes",
 ];
 
-const eventsData = [
-  {
-    id: 1,
-    title: "Music Concert",
-    category: "Music",
-    city: "Visakhapatnam",
-    online: false,
-  },
-  {
-    id: 2,
-    title: "Charity Run",
-    category: "Charity & Causes",
-    city: "Delhi",
-    online: false,
-  },
-  {
-    id: 3,
-    title: "Online Tech Meetup",
-    category: "Online",
-    city: "",
-    online: true,
-  },
-  {
-    id: 4,
-    title: "Food Festival",
-    category: "Food & Drink",
-    city: "Mumbai",
-    online: false,
-  },
-];
+type EventType = {
+  id: number;
+  title: string;
+  category: string;
+  city: string;
+  mode: string;
+  date: string;
+  description: string;
+  price: number | null;
+  image: string;
+  organization: string | null;
+};
+
 
 const EventListPrefer = () => {
   const router = useRouter();
@@ -58,8 +41,11 @@ const EventListPrefer = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [city, setCity] = useState("Visakhapatnam");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [events, setEvents] = useState<EventType[]>([])
+  const [loading, setLoading] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState("All");
   const visibleCount = 10;
+
   useEffect(() => {
     const checkScrollable = () => {
       if (containerRef.current) {
@@ -83,15 +69,43 @@ const EventListPrefer = () => {
     return eventDay === 5 || eventDay === 6;
   };
 
-  const filteredEvents = eventsData.filter((event) => {
-    if (selectedFilter === "All") return true;
-    if (selectedFilter === "Online") return event.online;
-    // if (selectedFilter === "Free") return event.price === 0; // Free ticket filter
-    // if (selectedFilter === "Today") return isToday(event.date); // Check if event is today
-    // if (selectedFilter === "This weekend") return isThisWeekend(event.date); // Check if event is this weekend
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `http://localhost:8000/events/event/?city=${encodeURIComponent(city)}`, 
+          { credentials: "include" }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data)
+          setEvents(data);
+        } else {
+          console.error("Failed to fetch events");
+          setEvents([]);
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        setEvents([]);
+      }
+      setLoading(false);
+    };
 
-    return event.category.toLowerCase() === selectedFilter.toLowerCase(); // Category filter
+    fetchEvents();
+  }, [city])
+
+  const filteredEvents = events.filter((event) => {
+    if (selectedFilter === "All") return true;
+    if (selectedFilter === "Online") return event.mode === "Online"; // Only online events
+    if (selectedFilter === "On Site") return event.mode === "On Site"; // Only on-site events
+    if (selectedFilter === "Free") return event.price === null || event.price === 0; // Free events
+    if (selectedFilter === "Today") return isToday(event.date); // Events happening today
+    if (selectedFilter === "This weekend") return isThisWeekend(event.date); // Events happening this weekend
+  
+    return event.category?.toLowerCase() === selectedFilter.toLowerCase(); // Match category
   });
+  
 
   return (
     <div className="relative w-full py-4 px-12">
@@ -166,7 +180,7 @@ const EventListPrefer = () => {
 
       <div className="flex justify-center mt-6 pb-8">
         <motion.button
-          onClick={() => router.push("/all-events")}
+          onClick={() => router.push(`/all-events?city=${encodeURIComponent(city)}`)}
           className="px-6 py-2 bg-white text-[#004aad] border border-[#004aad] font-extrabold uppercase tracking-widest rounded-md cursor-pointer transition-colors duration-300 ease-in-out hover:bg-gray-100"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}

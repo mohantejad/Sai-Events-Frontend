@@ -1,13 +1,17 @@
 import Image from "next/image";
 
-interface Event {
+type Event = {
   id: number;
   title: string;
   category: string;
   city: string;
-  online: boolean;
-  image?: string;
-}
+  mode: string;
+  date: string;
+  description: string;
+  price: number | null;
+  image: string;
+  organization: string | null;
+};
 
 interface EventCardProps {
   event: Event;
@@ -19,7 +23,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       <div className="relative w-full h-48">
         <Image
           src={event.image || "/images/default-event.jpg"}
-          alt={event.title}
+          alt='abc'
           layout="fill"
           objectFit="cover"
         />
@@ -27,7 +31,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       <div className="p-4">
         <h3 className="text-lg font-bold mb-1">{event.title}</h3>
         <p className="text-sm text-gray-500">Category: {event.category}</p>
-        {event.online ? (
+        {event.mode == 'Online' ? (
           <p className="text-green-600 font-semibold">Online Event</p>
         ) : (
           <p className="text-gray-600">Location: {event.city}</p>
