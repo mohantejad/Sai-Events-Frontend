@@ -3,10 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
-import { MdMyLocation, MdOutlineOnlinePrediction } from "react-icons/md";
-import { CiLocationOn } from "react-icons/ci";
 import EventCard from "./utils/EventCard";
 import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
 
 const eventFilters = [
   "All",
@@ -34,30 +33,89 @@ type EventType = {
   organization: string | null;
 };
 
+const cities = [
+  "Visakhapatnam",
+  "Hyderabad",
+  "Mumbai",
+  "Delhi",
+  "Bangalore",
+  "Chennai",
+  "Kolkata",
+  "Pune",
+  "Ahmedabad",
+  "Jaipur",
+  "Vijayawada",
+  "Kochi",
+];
+
+type FormValues = {
+  location: string;
+};
 
 const EventListPrefer = () => {
   const router = useRouter();
-  const [isScrollable, setIsScrollable] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [city, setCity] = useState("Visakhapatnam");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [events, setEvents] = useState<EventType[]>([])
-  const [loading, setLoading] = useState(false)
+  const [events, setEvents] = useState<EventType[]>([]);
+  const [loading, setLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("All");
+  const [filteredCities, setFilteredCities] = useState<string[]>(cities);
   const visibleCount = 10;
 
+  const {
+    control,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: { location: "" },
+  });
+
+  const handleCityInput = (value: string) => {
+    setValue("location", value);
+    setFilteredCities(
+      value
+        ? cities.filter((city) =>
+            city.toLowerCase().startsWith(value.toLowerCase())
+          )
+        : cities
+    );
+  };
+
+  const handleCitySelect = (city: string) => {
+    setValue("location", city);
+    setCity(city);
+    setIsDropdownOpen(false);
+  };
+
   useEffect(() => {
-    const checkScrollable = () => {
-      if (containerRef.current) {
-        setIsScrollable(
-          containerRef.current.scrollWidth > containerRef.current.clientWidth
+    const fetchEvents = async () => {
+      setLoading(true);
+      console.log(city)
+      try {
+        const response = await fetch(
+          `http://localhost:8000/events/event/filter/?city=${encodeURIComponent(
+            city
+          )}`,
+          {
+            credentials: "include",
+          }
         );
+        if (response.ok) {
+          setEvents(await response.json());
+        } else {
+          setEvents([]);
+        }
+      } catch (error) {
+        setEvents([]);
       }
+      setLoading(false);
     };
-    checkScrollable();
-    window.addEventListener("resize", checkScrollable);
-    return () => window.removeEventListener("resize", checkScrollable);
-  }, []);
+    fetchEvents();
+  }, [city]);
+
+
 
   const isToday = (eventDate: string) => {
     const today = new Date().toISOString().split("T")[0];
@@ -69,81 +127,90 @@ const EventListPrefer = () => {
     return eventDay === 5 || eventDay === 6;
   };
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `http://localhost:8000/events/event/?city=${encodeURIComponent(city)}`, 
-          { credentials: "include" }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data)
-          setEvents(data);
-        } else {
-          console.error("Failed to fetch events");
-          setEvents([]);
-        }
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        setEvents([]);
-      }
-      setLoading(false);
-    };
-
-    fetchEvents();
-  }, [city])
-
   const filteredEvents = events.filter((event) => {
     if (selectedFilter === "All") return true;
-    if (selectedFilter === "Online") return event.mode === "Online"; // Only online events
-    if (selectedFilter === "On Site") return event.mode === "On Site"; // Only on-site events
-    if (selectedFilter === "Free") return event.price === null || event.price === 0; // Free events
-    if (selectedFilter === "Today") return isToday(event.date); // Events happening today
-    if (selectedFilter === "This weekend") return isThisWeekend(event.date); // Events happening this weekend
-  
-    return event.category?.toLowerCase() === selectedFilter.toLowerCase(); // Match category
+    if (selectedFilter === "Online") return event.mode === "Online";
+    if (selectedFilter === "On Site") return event.mode === "On Site";
+    if (selectedFilter === "Free")
+      return event.price === null || event.price === 0;
+    if (selectedFilter === "Today") return isToday(event.date);
+    if (selectedFilter === "This weekend") return isThisWeekend(event.date);
+
+    return event.category?.toLowerCase() === selectedFilter.toLowerCase();
   });
-  
 
   return (
     <div className="relative w-full py-4 px-12">
-      <div className="flex space-x-4 flex-col md:flex-row">
-        <h2 className="text-xl font-bold mb-4">Browsing events in</h2>
-        <div
-          className="flex items-center space-x-2 mb-4 text-[#004aad] font-semibold uppercase"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+      <div className="flex space-x-4 flex-col md:flex-row mb-4">
+        <h2 className="text-xl font-bold">Browsing events in</h2>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setCity(watch("location"));
+          }}
+          className="flex items-center border-b border-[#004aad] "
         >
           <IoIosArrowDown size={28} />
-          <input
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="Enter city name..."
-            className="p-2 rounded-md text-[#004aad] font-semibold uppercase outline-none"
-          />
-        </div>
-        {isDropdownOpen && (
-          <div className="absolute bg-white border border-[#81a7e3] w-70 rounded-lg mt-22">
-            <div className="max-h-40 overflow-y-auto flex flex-col">
-              <div className="flex items-center space-x-4 border-b border-b-gray-100 cursor-pointer px-6 py-4 hover:bg-gray-100">
-                <MdMyLocation className="text-[#004aad]" />
-                <span>Use my current location</span>
-              </div>
 
-              <div className="flex items-center space-x-4 border-b border-b-gray-100 cursor-pointer px-6 py-4 hover:bg-gray-100">
-                <MdOutlineOnlinePrediction className="text-[#004aad]" />
-                <span>Browse Online events</span>
-              </div>
+          <div className="relative flex items-center px-4 w-full">
+            <Controller
+              name="location"
+              control={control}
+              render={({ field, fieldState }) => (
+                <div className="w-full">
+                  <input
+                    {...field}
+                    type="text"
+                    placeholder={`${city}`}
+                    className="bg-transparent outline-none w-full text-[#004aad]/90"
+                    onChange={(e) => handleCityInput(e.target.value)}
+                    onFocus={() => setIsDropdownOpen(true)}
+                    onBlur={() =>
+                      setTimeout(() => setIsDropdownOpen(false), 200)
+                    }
+                    autoComplete="off"
+                  />
+                  {fieldState.error && (
+                    <p className="text-red-500 text-sm">
+                      {fieldState.error.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
 
-              <div className="flex items-center space-x-4 cursor-pointer px-6 py-4 hover:bg-gray-100">
-                <CiLocationOn className="text-[#004aad]" />
-                <span>Your location</span>
-              </div>
-            </div>
+            {isDropdownOpen && (
+              <ul className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-md mt-1 z-10 h-48 overflow-y-scroll">
+                {filteredCities.length === 0 &&
+                  watch("location") === "" &&
+                  cities.map((city, index) => (
+                    <li
+                      key={index}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleCitySelect(city)}
+                    >
+                      {city}
+                    </li>
+                  ))}
+
+                {filteredCities.length > 0 ? (
+                  filteredCities.map((city, index) => (
+                    <li
+                      key={index}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleCitySelect(city)}
+                    >
+                      {city}
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-2 text-gray-500">No cities found</li>
+                )}
+              </ul>
+            )}
           </div>
-        )}
+        </form>
       </div>
 
       <motion.div
@@ -180,7 +247,9 @@ const EventListPrefer = () => {
 
       <div className="flex justify-center mt-6 pb-8">
         <motion.button
-          onClick={() => router.push(`/all-events?city=${encodeURIComponent(city)}`)}
+          onClick={() =>
+            router.push(`/all-events?city=${encodeURIComponent(city)}`)
+          }
           className="px-6 py-2 bg-white text-[#004aad] border border-[#004aad] font-extrabold uppercase tracking-widest rounded-md cursor-pointer transition-colors duration-300 ease-in-out hover:bg-gray-100"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}

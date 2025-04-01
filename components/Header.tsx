@@ -12,13 +12,12 @@ import { RootState } from "@/redux/store";
 import { logout } from "@/redux/authSlice";
 
 const Header = () => {
-  const pathname = usePathname();
-  const dispatch = useDispatch();
-  const router = useRouter();
+  const pathname = usePathname()
+  const dispatch = useDispatch()
+  const router = useRouter()
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  // const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth

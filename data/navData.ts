@@ -7,13 +7,13 @@ export const NavItems = [
   },
   {
     text: "Add Event",
-    link: "/events",
+    link: "/add-events",
     desktopStyles: "hidden md:block",
     mobileStyles: "md:hidden block",
   },
   {
-    text: "Tickets",
-    link: "/tickets",
+    text: "My Tickets",
+    link: "/my-tickets",
     desktopStyles: "hidden",
     mobileStyles: "block",
   },
@@ -33,7 +33,7 @@ export const authNavItems = [
     mobileStyles: "lg:hidden block",
   },
   {
-    text: "Signup",
+    text: "Sign up",
     link: "/signup",
     desktopStyles: "hidden lg:block",
     mobileStyles: "lg:hidden block",
