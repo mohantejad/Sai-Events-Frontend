@@ -1,126 +1,143 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { EventType } from "@/types";
+import EventCard from "@/components/utils/EventCard";
 
-const categories = ['Business', 'Food & Drink', 'Health', 'Music'];
-const dates = ['Today', 'Tomorrow', 'This weekend'];
+const categories = [
+  "Music",
+  "Nightlife",
+  "Performing & Visual Arts",
+  "Holidays",
+  "Dating",
+  "Hobbies",
+  "Business",
+  "Food & Drink",
+];
 
 const Page = () => {
-  const [events, setEvents] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
   const searchParams = useSearchParams();
+  const [events, setEvents] = useState<EventType[]>([]);
+  const categoryFromUrl = searchParams.get("category") || ""
+  const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
+  const [selectedDate, setSelectedDate] = useState('');
   const city = searchParams.get('city') || '';
-  const searchKeyword = searchParams.get("search") || ""
-
+  const searchKeyword = searchParams.get('search') || '';
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        let apiUrl = `http://localhost:8000/events/event/filter/?`
-        if (city) apiUrl += `city=${encodeURIComponent(city)}&`
-        if (searchKeyword) apiUrl += `search=${encodeURIComponent(searchKeyword)}`
-        const res = await fetch(apiUrl)
+        let apiUrl = `https://sai-events-backend-simplified.onrender.com/api/events/?`;
+        if (city) apiUrl += `city=${encodeURIComponent(city)}&`;
+        if (searchKeyword)
+          apiUrl += `search=${encodeURIComponent(searchKeyword)}&`;
+        if (selectedCategory)
+          apiUrl += `event_category=${encodeURIComponent(selectedCategory)}&`;
+        if (selectedDate) apiUrl += `date=${encodeURIComponent(selectedDate)}`;
 
+        const res = await fetch(apiUrl);
         const data = await res.json();
+
         setEvents(data);
       } catch (error) {
-        console.error('Error fetching events:', error);
+        console.error("Error fetching events:", error);
       }
     };
     fetchEvents();
-  }, [city, searchKeyword]);
+  }, [city, searchKeyword, selectedCategory, selectedDate]);
 
-  function isMatchingDate(eventDate: string, filter: string) {
-    const eventDay = new Date(eventDate).toISOString().split('T')[0];
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split('T')[0];
-
-    if (filter === 'Today') return eventDay === today;
-    if (filter === 'Tomorrow') return eventDay === tomorrowStr;
-    if (filter === 'This weekend') {
-      const dayOfWeek = new Date(eventDate).getDay();
-      return dayOfWeek === 5 || dayOfWeek === 6;
-    }
-    return true;
-  }
-
-  const filteredEvents = events.filter((event: any) => {
-    if (selectedCategory && event.category !== selectedCategory) return false;
-    if (selectedDate && !isMatchingDate(event.date, selectedDate)) return false;
-    return true;
-  });
+  const resetFilters = () => {
+    setSelectedCategory("");
+    setSelectedDate("");
+  };
 
   return (
-    <div className='container mx-auto px-4 py-8'>
-      <h2 className='text-3xl font-bold mb-2'>Events in {city}, India</h2>
-      <p className='text-gray-500 mb-6'>
+    <div className="container mx-auto px-4 py-8">
+      <h2 className="text-3xl font-bold mb-2">Events in {city || "Australia"}</h2>
+      <p className="text-gray-500 mb-6">
         Search for something you love or check out popular events in your area.
       </p>
 
-      <div className='flex gap-8'>
-        <aside className='w-1/4 hidden md:block'>
-          <h3 className='font-bold text-xl mb-4'>Filters</h3>
-          <div className='mb-6'>
-            <h4 className='font-semibold mb-2 text-lg'>Category</h4>
+      <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+        <div className="w-full md:w-1/4 flex flex-col md:block">
+          <h3 className="font-bold text-xl mb-4 uppercase">Filters</h3>
+
+          <div className="mb-4 w-full md:hidden">
+            <label className="block font-semibold text-lg">Category</label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="">All Categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mb-4 w-full md:hidden">
+            <label className="block font-semibold text-lg">Date</label>
+            <select
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="">Any Date</option>
+              <option value="today">Today</option>
+              <option value="tomorrow">Tomorrow</option>
+              <option value="this_weekend">This Weekend</option>
+            </select>
+          </div>
+
+          <div className="hidden md:block">
+            <h4 className="font-semibold mb-2 text-lg">Category</h4>
             {categories.map((category) => (
               <p
                 key={category}
                 className={`cursor-pointer py-1 ${
-                  selectedCategory === category ? 'text-blue-600 font-bold' : 'text-gray-600'
+                  selectedCategory === category
+                    ? "text-blue-600 font-bold"
+                    : "text-gray-600"
                 }`}
                 onClick={() => setSelectedCategory(category)}
               >
                 {category}
               </p>
             ))}
-            <p className='text-blue-500 cursor-pointer mt-2'>View more</p>
           </div>
-          <div>
-            <h4 className='font-semibold mb-2 text-lg'>Date</h4>
-            {dates.map((date) => (
+
+          <div className="hidden md:block">
+            <h4 className="font-semibold mb-2 text-lg">Date</h4>
+            {["Today", "Tomorrow", "This Weekend"].map((date) => (
               <p
                 key={date}
                 className={`cursor-pointer py-1 ${
-                  selectedDate === date ? 'text-blue-600 font-bold' : 'text-gray-600'
+                  selectedDate === date.toLowerCase()
+                    ? "text-blue-600 font-bold"
+                    : "text-gray-600"
                 }`}
-                onClick={() => setSelectedDate(date)}
+                onClick={() => setSelectedDate(date.toLowerCase())}
               >
                 {date}
               </p>
             ))}
-            <p className='text-gray-500 mt-2'>Pick a date...</p>
           </div>
-        </aside>
 
-        <div className='w-full'>
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8'>
-            {filteredEvents.length > 0 ? (
-              filteredEvents.map((event: any) => (
-                <div key={event.id} className='border rounded-lg overflow-hidden'>
-                  <Image
-                    src={event.image}
-                    alt='Event'
-                    width={100}
-                    height={30}
-                    className='w-full object-cover'
-                  />
-                  <div className='p-4'>
-                    <h3 className='font-bold text-lg'>{event.title}</h3>
-                    <p className='text-gray-500 text-sm'>
-                      {new Date(event.date).toDateString()} • {event.city}
-                    </p>
-                    <p className='text-gray-700 mt-2'>{event.organization || 'Unknown Organizer'}</p>
-                    <p className='text-blue-600 font-semibold mt-2'>{event.price ? `$${event.price}` : 'Free'}</p>
-                  </div>
-                </div>
-              ))
+          <button
+            className="p-2 bg-gray-300 text-black rounded-md w-full"
+            onClick={resetFilters}
+          >
+            Reset Filters
+          </button>
+        </div>
+        <div className="w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            {events.length > 0 ? (
+              events.map((event) => <EventCard key={event.id} event={event} />)
             ) : (
-              <p className='text-gray-500'>No events found.</p>
+              <p className="text-gray-500">No events found.</p>
             )}
           </div>
         </div>

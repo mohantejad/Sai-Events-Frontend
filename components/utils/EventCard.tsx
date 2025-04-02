@@ -1,43 +1,48 @@
-import Image from "next/image";
+import Image from "next/image"
+import { EventType } from "@/types";
+import Link from "next/link";
+import { format } from "date-fns";
 
-type Event = {
-  id: number;
-  title: string;
-  category: string;
-  city: string;
-  mode: string;
-  date: string;
-  description: string;
-  price: number | null;
-  image: string;
-  organization: string | null;
-};
 
 interface EventCardProps {
-  event: Event;
+  event: EventType;
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
+
+  const backendUrl = "https://sai-events-backend-simplified.onrender.com";
+  const imageUrl = event.image.startsWith("/media")
+  ? `${backendUrl}${event.image}`
+  : event.image;
+
+  console.log(imageUrl)
   return (
-    <div className="b4order rounded-lg shadow-sm border border-[#81a7e3] overflow-hidden transition-transform transform hover:scale-105 cursor-pointer">
-      <div className="relative w-full h-48">
-        <Image
-          src={event.image || "/images/default-event.jpg"}
-          alt='abc'
-          layout="fill"
-          objectFit="cover"
-        />
+    <Link href={`/event-detail/${event.id}`} className="block">
+      <div className="border rounded-lg shadow-md border-[#81a7e3] overflow-hidden transition-transform transform hover:scale-105 cursor-pointer bg-white">
+        <div className="relative w-full h-52">
+          <Image
+            src={imageUrl || "/images/default-event.jpg"}
+            alt={event.title}
+            width={500}
+            height={500}
+            className="rounded-t-lg"
+            priority
+            unoptimized
+          />
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-lg font-bold text-[#004aad]">{event.title}</h3>
+          <p className="text-gray-500 text-sm mt-1">
+            {event.city} • {format(new Date(event.date), "PPP p")}
+          </p>
+          <p className="text-sm text-gray-700 mt-2 line-clamp-2">
+            {event.event_category}
+          </p>
+          <p className="text-xs text-gray-500 mt-3">By {event.created_by}</p>
+        </div>
       </div>
-      <div className="p-4">
-        <h3 className="text-lg font-bold mb-1">{event.title}</h3>
-        <p className="text-sm text-gray-500">Category: {event.category}</p>
-        {event.mode == 'Online' ? (
-          <p className="text-green-600 font-semibold">Online Event</p>
-        ) : (
-          <p className="text-gray-600">Location: {event.city}</p>
-        )}
-      </div>
-    </div>
+    </Link>
   );
 };
 

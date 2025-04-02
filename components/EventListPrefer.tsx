@@ -6,6 +6,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import EventCard from "./utils/EventCard";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
+import { EventType } from "@/types";
 
 const eventFilters = [
   "All",
@@ -20,32 +21,15 @@ const eventFilters = [
   "Charity & Causes",
 ];
 
-type EventType = {
-  id: number;
-  title: string;
-  category: string;
-  city: string;
-  mode: string;
-  date: string;
-  description: string;
-  price: number | null;
-  image: string;
-  organization: string | null;
-};
-
 const cities = [
-  "Visakhapatnam",
-  "Hyderabad",
-  "Mumbai",
-  "Delhi",
-  "Bangalore",
-  "Chennai",
-  "Kolkata",
-  "Pune",
-  "Ahmedabad",
-  "Jaipur",
-  "Vijayawada",
-  "Kochi",
+  "Sydney",
+  "Melbourne",
+  "Brisbane",
+  "Adelaide",
+  "Perth",
+  "Hobart",
+  "Darwin",
+  "Canberra",
 ];
 
 type FormValues = {
@@ -55,7 +39,7 @@ type FormValues = {
 const EventListPrefer = () => {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [city, setCity] = useState("Visakhapatnam");
+  const [city, setCity] = useState("Sydney");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -95,7 +79,7 @@ const EventListPrefer = () => {
       console.log(city)
       try {
         const response = await fetch(
-          `http://localhost:8000/events/event/filter/?city=${encodeURIComponent(
+          `https://sai-events-backend-simplified.onrender.com/api/events/?city=${encodeURIComponent(
             city
           )}`,
           {
@@ -129,14 +113,10 @@ const EventListPrefer = () => {
 
   const filteredEvents = events.filter((event) => {
     if (selectedFilter === "All") return true;
-    if (selectedFilter === "Online") return event.mode === "Online";
-    if (selectedFilter === "On Site") return event.mode === "On Site";
-    if (selectedFilter === "Free")
-      return event.price === null || event.price === 0;
     if (selectedFilter === "Today") return isToday(event.date);
     if (selectedFilter === "This weekend") return isThisWeekend(event.date);
 
-    return event.category?.toLowerCase() === selectedFilter.toLowerCase();
+    return event.event_category?.toLowerCase() === selectedFilter.toLowerCase();
   });
 
   return (

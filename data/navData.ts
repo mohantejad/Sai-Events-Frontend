@@ -1,21 +1,21 @@
 export const NavItems = [
   {
-    text: "Contact",
-    link: "/contact",
-    desktopStyles: "hidden xl:block",
-    mobileStyles: "xl:hidden block",
+    text: "Profile",
+    link: "/user-profile",
+    desktopStyles: "hidden",
+    mobileStyles: "block",
   },
   {
     text: "Add Event",
-    link: "/add-events",
+    link: "/create-event",
     desktopStyles: "hidden md:block",
     mobileStyles: "md:hidden block",
   },
   {
-    text: "My Tickets",
-    link: "/my-tickets",
-    desktopStyles: "hidden",
-    mobileStyles: "block",
+    text: "Contact",
+    link: "/contact",
+    desktopStyles: "hidden xl:block",
+    mobileStyles: "xl:hidden block",
   },
   {
     text: "Help",

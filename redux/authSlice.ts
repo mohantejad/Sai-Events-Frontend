@@ -3,17 +3,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface AuthState {
   user: {
     id: string;
-    first_name: string;
-    last_name: string;
+    username: string
     email: string;
     profile_picture?: string;
   } | null;
   isAuthenticated: boolean;
 }
 
+const storedUser = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
 const initialState: AuthState = {
-  user: null,
-  isAuthenticated: false,
+  user: storedUser ? JSON.parse(storedUser) : null,
+  isAuthenticated: storedUser ? true : false,
 };
 
 const authSlice = createSlice({
@@ -23,16 +24,19 @@ const authSlice = createSlice({
     loginSuccess: (state, action: PayloadAction<{ user: any }>) => {
       state.user = {
         id: action.payload.user.id,
-        first_name: action.payload.user.first_name,
-        last_name: action.payload.user.last_name,
+        username: action.payload.user.username,
         email: action.payload.user.email,
         profile_picture: action.payload.user.profile_picture || "",
       };
       state.isAuthenticated = true;
+      localStorage.setItem("user", JSON.stringify(state.user))
     },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken")
     },
   },
 });

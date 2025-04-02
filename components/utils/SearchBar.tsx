@@ -6,19 +6,16 @@ import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 const cities = [
-  "Visakhapatnam",
-  "Hyderabad",
-  "Mumbai",
-  "Delhi",
-  "Bangalore",
-  "Chennai",
-  "Kolkata",
-  "Pune",
-  "Ahmedabad",
-  "Jaipur",
-  "Vijayawada",
-  "Kochi",
+  "Sydney",
+  "Melbourne",
+  "Brisbane",
+  "Adelaide",
+  "Perth",
+  "Hobart",
+  "Darwin",
+  "Canberra",
 ];
+
 
 type FormValues = {
   eventSearch: string;

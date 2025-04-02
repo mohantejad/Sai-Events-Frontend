@@ -10,14 +10,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { logout } from "@/redux/authSlice";
+import { toast } from "react-toastify";
 
 const Header = () => {
-  const pathname = usePathname()
-  const dispatch = useDispatch()
-  const router = useRouter()
+  const pathname = usePathname();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [isClient, setIsClient] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
@@ -38,19 +39,33 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:8000/auth/logout/", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (response.ok) {
-        dispatch(logout());
-        setMenuOpen(false)
-        router.push("/");
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (!refreshToken) {
+        console.error("No refresh token found, forcing logout");
       } else {
-        console.error("Logout failed");
+        const response = await fetch(
+          "https://sai-events-backend-simplified.onrender.com/auth/jwt/blacklist/",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh: refreshToken }),
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Logout failed from server");
+        }
       }
+      localStorage.clear();
+      dispatch(logout());
+      setMenuOpen(false);
+      router.push("/");
+      toast.success("Logged out successfully! 👋");
     } catch (error) {
       console.error("Error logging out:", error);
+      toast.error("Logout failed! Please try again.");
     }
   };
 
@@ -73,7 +88,8 @@ const Header = () => {
             <Link
               key={item.text}
               href={item.link}
-              className={`${item.desktopStyles}`}
+              className={`${item.desktopStyles} cursor-pointer`}
+              onClick={() => setMenuOpen(false)}
             >
               {item.text}
             </Link>
@@ -84,7 +100,8 @@ const Header = () => {
               <Link
                 key={item.text}
                 href={item.link}
-                className={`${item.desktopStyles}`}
+                className={`${item.desktopStyles} cursor-pointer`}
+                onClick={() => setMenuOpen(false)}
               >
                 {item.text}
               </Link>
@@ -96,22 +113,17 @@ const Header = () => {
                 className="cursor-pointer"
                 onClick={() => setMenuOpen(!menuOpen)}
               >
-                <Image
-                  src={user.profile_picture || "/default-profile.png"}
-                  alt="Profile"
-                  width={40}
-                  height={40}
-                  className="rounded-full border border-gray-300"
-                />
+                {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
               </div>
 
               {menuOpen && (
-                <div className="absolute top-12 right-0 z-50 bg-white shadow-lg rounded-lg flex flex-col items-center space-y-4 py-4 px-6 text-[#004aad] uppercase border">
+                <div className="absolute top-12 right-0 z-50 bg-white shadow-lg rounded-lg flex flex-col items-start text-[#004aad] uppercase">
                   {NavItems.map((item) => (
                     <Link
                       key={item.text}
                       href={item.link}
-                      className={`${item.mobileStyles}`}
+                      className={`${item.mobileStyles} cursor-pointer py-2 px-8 whitespace-nowrap w-full hover:bg-[#004aad]/10`}
+                      onClick={() => setMenuOpen(false)}
                     >
                       {item.text}
                     </Link>
@@ -119,7 +131,7 @@ const Header = () => {
 
                   <button
                     onClick={handleLogout}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700 cursor-pointer py-2 px-8 hover:bg-[#004aad]/10 w-full flex-start flex"
                   >
                     Logout
                   </button>
@@ -138,12 +150,13 @@ const Header = () => {
       )}
 
       {menuOpen && isClient && !isAuthPage && !user ? (
-        <div className="absolute top-16 right-0 z-50 bg-white shadow-lg rounded-lg flex flex-col items-center space-y-4 py-4 px-16 text-[#004aad] uppercase border">
+        <div className="absolute top-18 right-2 z-50 bg-white shadow-lg rounded-lg flex flex-col items-center text-[#004aad] uppercase ">
           {NavItems.map((item) => (
             <Link
               key={item.text}
               href={item.link}
-              className={`${item.mobileStyles}`}
+              className={`${item.mobileStyles} cursor-pointer py-2 px-8 whitespace-nowrap w-full hover:bg-[#004aad]/10`}
+              onClick={() => setMenuOpen(false)}
             >
               {item.text}
             </Link>
@@ -154,13 +167,14 @@ const Header = () => {
               <Link
                 key={item.text}
                 href={item.link}
-                className={`${item.mobileStyles}`}
+                className={`${item.mobileStyles} cursor-pointer py-2 px-8 whitespace-nowrap w-full hover:bg-[#004aad]/10`}
+                onClick={() => setMenuOpen(false)}
               >
                 {item.text}
               </Link>
             ))}
         </div>
-      ) : null }
+      ) : null}
     </header>
   );
 };
