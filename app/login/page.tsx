@@ -8,6 +8,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import Link from "next/link";
 import React from "react";
 import { loginSuccess } from "@/redux/authSlice";
+import Image from "next/image";
 
 interface LoginFormInputs {
   username: string;
@@ -58,8 +59,12 @@ const Page = () => {
 
       reset();
       router.push("/");
-    } catch (error: any) {
-      toast.error(error?.message || "Login failed! Please try again.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error?.message || "Login failed! Please try again.");
+      } else {
+        toast.error("An unknown error occurred");
+      }
     }
   };
 
@@ -68,7 +73,13 @@ const Page = () => {
       <div className="bg-white border  border-[#81a7e3] rounded-lg p-8 w-full max-w-md">
         <div className="flex justify-center">
           <Link href="/">
-            <img src="/logo2.png" alt="Sai Events" className="w-20 h-20" />
+            <Image 
+              src="/logo2.png" 
+              alt="Sai Events" 
+              width={100}
+              height={100}
+              className="w-20 h-20" 
+            />
           </Link>
         </div>
 
@@ -148,7 +159,7 @@ const Page = () => {
         </form>
 
         <p className="mt-4 text-center text-[#004aad]/90">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/signup">
             <span className="text-[#004aad] font-semibold hover:underline cursor-pointer uppercase">
               Sign Up

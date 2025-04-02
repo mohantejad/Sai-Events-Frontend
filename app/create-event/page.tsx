@@ -78,8 +78,12 @@ const CreateEventPage = () => {
       toast.success("Event created successfully!");
       reset();
       router.push("/user-profile");
-    } catch (error: any) {
-      toast.error(error.message || "Event creation failed");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || "Event creation failed");
+      } else {
+        toast.error("An unknown error occurred");
+      }
     } finally {
       setIsSubmitting(false);
     }

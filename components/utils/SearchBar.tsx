@@ -30,7 +30,7 @@ const SearchBar = () => {
     watch,
     setValue,
     setError,
-    formState: { errors },
+    formState: { },
   } = useForm<FormValues>({
     defaultValues: {
       eventSearch: "",

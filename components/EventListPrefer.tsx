@@ -42,7 +42,6 @@ const EventListPrefer = () => {
   const [city, setCity] = useState("Sydney");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [events, setEvents] = useState<EventType[]>([]);
-  const [loading, setLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [filteredCities, setFilteredCities] = useState<string[]>(cities);
   const visibleCount = 10;
@@ -51,7 +50,7 @@ const EventListPrefer = () => {
     control,
     setValue,
     watch,
-    formState: { errors },
+    formState: { },
   } = useForm<FormValues>({
     defaultValues: { location: "" },
   });
@@ -75,7 +74,6 @@ const EventListPrefer = () => {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      setLoading(true);
       console.log(city)
       try {
         const response = await fetch(
@@ -93,8 +91,8 @@ const EventListPrefer = () => {
         }
       } catch (error) {
         setEvents([]);
+        console.log(error)
       }
-      setLoading(false);
     };
     fetchEvents();
   }, [city]);
@@ -137,7 +135,7 @@ const EventListPrefer = () => {
             <Controller
               name="location"
               control={control}
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <div className="w-full">
                   <input
                     {...field}
@@ -151,11 +149,6 @@ const EventListPrefer = () => {
                     }
                     autoComplete="off"
                   />
-                  {fieldState.error && (
-                    <p className="text-red-500 text-sm">
-                      {fieldState.error.message}
-                    </p>
-                  )}
                 </div>
               )}
             />

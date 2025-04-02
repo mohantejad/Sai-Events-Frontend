@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { EventType } from "@/types"; 
+import Image from "next/image"
 
 const EventDetail = () => {
   const { id } = useParams();
@@ -30,7 +31,7 @@ const EventDetail = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row items-center justify-center gap-20">
         <div className="md:w-2/5">
-          <img
+          <Image
             src={event.image}
             alt={event.title}
             width={400}

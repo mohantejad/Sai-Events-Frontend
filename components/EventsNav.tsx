@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -17,15 +17,12 @@ const categories = [
 
 const EventsNav = () => {
   const router = useRouter();
-  const [isScrollable, setIsScrollable] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const checkScrollable = () => {
       if (containerRef.current) {
-        setIsScrollable(
-          containerRef.current.scrollWidth > containerRef.current.clientWidth
-        );
+
       }
     };
     checkScrollable();

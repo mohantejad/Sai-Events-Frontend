@@ -8,7 +8,9 @@ import { UserType, EventType } from "@/types";
 import { RootState } from "@/redux/store";
 import EventCard from "@/components/utils/EventCard";
 
-const page = () => {
+
+
+const UserDetails = () => {
   const router = useRouter();
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,15 +50,19 @@ const page = () => {
         const { user, events } = await response.json();
         setUserDetails(user);
         setEvents(events);
-      } catch (error: any) {
-        toast.error(error?.message || "Error fetching profile");
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(error?.message || "Error fetching profile");
+        } else {
+          toast.error("An unknown error occurred");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserProfile();
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   const handleUpdateProfile = async () => {
     try {
@@ -86,9 +92,14 @@ const page = () => {
 
       toast.success("Profile updated successfully! 🎉");
       setEditMode(false);
-    } catch (error: any) {
-      toast.error(error?.message || "Error updating profile");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message || "Error updating profile");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
+    
   };
 
   if (loading)
@@ -189,4 +200,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default UserDetails;

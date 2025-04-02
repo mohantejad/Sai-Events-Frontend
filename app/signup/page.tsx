@@ -1,13 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Link from "next/link";
-import { useState } from "react";
-import { loginSuccess } from "@/redux/authSlice";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 interface SignupFormInputs {
   username: string;
@@ -16,9 +14,8 @@ interface SignupFormInputs {
   confirmPassword: string;
 }
 
-const page = () => {
+const Signup = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const {
     register,
@@ -43,9 +40,13 @@ const page = () => {
       toast.success("Signup successful! 🎉 Please login.");
       reset();
       router.push("/login");
-    } catch (error: any) {
-      toast.error(error?.message || "Signup failed! Please try again.");
-    }
+    } catch (error: unknown) {
+          if (error instanceof Error) {
+            toast.error(error?.message || "Signup failed! Please try again.");
+          } else {
+            toast.error("An unknown error occurred");
+          }
+        }
   };
 
   return (
@@ -53,7 +54,13 @@ const page = () => {
       <div className="bg-white border border-[#81a7e3] rounded-lg p-8 w-full max-w-md">
         <div className="flex justify-center">
           <Link href="/">
-            <img src="/logo2.png" alt="Sai Events" className="w-20 h-20" />
+            <Image 
+              src="/logo2.png" 
+              alt="Sai Events" 
+              height={500}
+              width={500}
+              className="w-20 h-20" 
+            />
           </Link>
         </div>
 
@@ -153,4 +160,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Signup;
