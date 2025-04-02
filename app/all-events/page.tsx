@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { EventType } from "@/types";
 import EventCard from "@/components/utils/EventCard";
@@ -17,13 +17,21 @@ const categories = [
 ];
 
 const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AllEventsContent />
+    </Suspense>
+  );
+};
+
+const AllEventsContent = () => {
   const searchParams = useSearchParams();
   const [events, setEvents] = useState<EventType[]>([]);
-  const categoryFromUrl = searchParams.get("category") || ""
+  const categoryFromUrl = searchParams.get("category") || "";
   const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
-  const [selectedDate, setSelectedDate] = useState('');
-  const city = searchParams.get('city') || '';
-  const searchKeyword = searchParams.get('search') || '';
+  const [selectedDate, setSelectedDate] = useState("");
+  const city = searchParams.get("city") || "";
+  const searchKeyword = searchParams.get("search") || "";
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -72,7 +80,9 @@ const Page = () => {
             >
               <option value="">All Categories</option>
               {categories.map((category) => (
-                <option key={category} value={category}>{category}</option>
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
             </select>
           </div>
