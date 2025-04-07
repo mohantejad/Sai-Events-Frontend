@@ -9,7 +9,7 @@ export const store = configureStore({
 
 const fetchUser = async () => {
     try {
-        const response = await fetch("https://sai-events-backend-simplified.onrender.com/auth/user/", {
+        const response = await fetch("http://localhost:8000/auth/user/", {
             method: "GET",
             credentials: "include",
         });

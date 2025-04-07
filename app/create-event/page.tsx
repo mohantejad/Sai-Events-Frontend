@@ -63,7 +63,7 @@ const CreateEventPage = () => {
     try {
       const token = localStorage.getItem("accessToken");
   
-      const response = await fetch("https://sai-events-backend-simplified.onrender.com/api/events/", {
+      const response = await fetch("http://localhost:8000/api/events/", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,

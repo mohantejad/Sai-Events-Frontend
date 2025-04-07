@@ -38,7 +38,7 @@ const UserDetails = () => {
           throw new Error("No access token found");
         }
 
-        const response = await fetch("https://sai-events-backend-simplified.onrender.com/auth/user/", {
+        const response = await fetch("http://localhost:8000/auth/user/", {
           method: "GET",
           headers: { Authorization: `Bearer ${accessToken}` },
         });
@@ -71,7 +71,7 @@ const UserDetails = () => {
         throw new Error("No access token found");
       }
 
-      const response = await fetch("https://sai-events-backend-simplified.onrender.com/auth/user/", {
+      const response = await fetch("http://localhost:8000/auth/user/", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

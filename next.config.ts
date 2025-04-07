@@ -2,15 +2,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['sai-events-backend-simplified.onrender.com'],
+    domains: [
+      'localhost'
+    ],
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "sai-events-backend-simplified.onrender.com",
-        port: '',
+        protocol: "http",
+        hostname: "localhost",
+        port: '8000',
         pathname: "/media/**",
         search: '',
-      },
+      }
     ],
   },
 };

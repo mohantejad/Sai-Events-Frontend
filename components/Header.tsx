@@ -45,7 +45,7 @@ const Header = () => {
         console.error("No refresh token found, forcing logout");
       } else {
         const response = await fetch(
-          "https://sai-events-backend-simplified.onrender.com/auth/jwt/blacklist/",
+          "http://localhost:8000/auth/jwt/blacklist/",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

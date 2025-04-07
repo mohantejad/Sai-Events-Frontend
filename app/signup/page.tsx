@@ -27,7 +27,7 @@ const Signup = () => {
 
   const onSubmit: SubmitHandler<SignupFormInputs> = async (data) => {
     try {
-      const response = await fetch("https://sai-events-backend-simplified.onrender.com/auth/signup/", {
+      const response = await fetch("http://localhost:8000/auth/signup/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

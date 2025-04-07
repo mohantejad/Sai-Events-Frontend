@@ -28,7 +28,7 @@ const Page = () => {
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     try {
-      const response = await fetch("https://sai-events-backend-simplified.onrender.com/auth/tokens/", {
+      const response = await fetch("http://localhost:8000/auth/tokens/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -43,7 +43,7 @@ const Page = () => {
       localStorage.setItem("accessToken", access);
       localStorage.setItem("refreshToken", refresh);
 
-      const userResponse = await fetch("https://sai-events-backend-simplified.onrender.com/auth/user/", {
+      const userResponse = await fetch("http://localhost:8000/auth/user/", {
         method: "GET",
         headers: { Authorization: `Bearer ${access}` },
       });

@@ -10,7 +10,7 @@ interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
-  const backendUrl = "https://sai-events-backend-simplified.onrender.com";
+  const backendUrl = "http://localhost:8000";
   const imageUrl = event.image.startsWith("/media")
   ? `${backendUrl}${event.image}`
   : event.image;

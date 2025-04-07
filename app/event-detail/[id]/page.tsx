@@ -12,7 +12,7 @@ const EventDetail = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const res = await fetch(`https://sai-events-backend-simplified.onrender.com/api/events/${id}/`);
+        const res = await fetch(`http://localhost:8000/api/events/${id}/`);
         const data = await res.json();
         setEvent(data);
       } catch (error) {
@@ -26,6 +26,7 @@ const EventDetail = () => {
   if (!event) {
     return <p className="text-center text-gray-500">Loading event details...</p>;
   }
+  console.log(event)
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -36,7 +36,7 @@ const AllEventsContent = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        let apiUrl = `https://sai-events-backend-simplified.onrender.com/api/events/?`;
+        let apiUrl = `http://localhost:8000/api/events/?`;
         if (city) apiUrl += `city=${encodeURIComponent(city)}&`;
         if (searchKeyword)
           apiUrl += `search=${encodeURIComponent(searchKeyword)}&`;

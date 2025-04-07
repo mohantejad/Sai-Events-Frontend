@@ -77,7 +77,7 @@ const EventListPrefer = () => {
       console.log(city)
       try {
         const response = await fetch(
-          `https://sai-events-backend-simplified.onrender.com/api/events/?city=${encodeURIComponent(
+          `http://localhost:8000/api/events/?city=${encodeURIComponent(
             city
           )}`,
           {
